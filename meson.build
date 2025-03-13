@@ -21,7 +21,11 @@ conf.set('HAVE_MEMMOVE', cc.has_function('memmove'))
 conf.set('HAVE_MEMSET', cc.has_function('memset'))
 
 # Set include directory
-inc_dir = include_directories('.')
+front_incs = include_directories('include/')
+src_core_incs = include_directories('src/core')
+src_utils_incs = include_directories('src/utils')
+src_target_x86 = include_directories('src/targets/x86')
+inc_dir = [ front_incs, src_core_incs, src_utils_incs, src_target_x86, ]
 
 # Define source files
 sources = [

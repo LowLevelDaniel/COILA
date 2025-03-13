@@ -71,6 +71,7 @@ typedef struct {
  * @brief x86-specific translation context data
  */
 typedef struct {
+  bool is_32bit;              /**< Whether target is 64-bit mode */
   bool is_64bit;              /**< Whether target is 64-bit mode */
   bool has_avx;               /**< Whether target has AVX */
   bool has_avx2;              /**< Whether target has AVX2 */

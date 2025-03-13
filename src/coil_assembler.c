@@ -32,12 +32,12 @@
 /**
  * @brief COIL assembler internal structure
  */
-struct coil_assembler_t {
+typedef struct coil_assembler {
   coil_assembler_config_t config;    /**< Configuration options */
   target_config_t* target;           /**< Target architecture configuration */
   optimization_context_t* optimizer; /**< Optimization context */
   native_format_t output_format;     /**< Output binary format */
-};
+} coil_assembler_t;
 
 /**
  * @brief Maps an internal error code to a COIL status code
@@ -435,7 +435,7 @@ coil_status_t coil_assembler_assemble_file(
   }
   
   /* Read file data */
-  size_t read_size = fread(buffer, 1, file_size, file);
+  size_t read_size = fread(buffer, 1, file_size, coil_filename);
   fclose(input_file);
   
   if (read_size != (size_t)file_size) {

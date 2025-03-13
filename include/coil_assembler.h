@@ -40,7 +40,7 @@ typedef enum {
 /**
  * @brief Opaque handle to a COIL assembler instance
  */
-typedef struct coil_assembler_t* coil_assembler_handle_t;
+typedef struct coil_assembler* coil_assembler_handle_t;
 
 /**
  * @brief Optimization levels for the assembler

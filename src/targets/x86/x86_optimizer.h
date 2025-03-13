@@ -21,6 +21,7 @@
  * @brief x86-specific optimization data
  */
 typedef struct {
+  bool is_32bit;
   bool is_64bit;              /**< Whether target is 64-bit mode */
   bool has_avx;               /**< Whether target has AVX */
   bool has_avx2;              /**< Whether target has AVX2 */
