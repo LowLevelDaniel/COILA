@@ -1,123 +1,120 @@
 project('coil-assembler', 'c',
-  version : '0.1.0',
+  version : '1.0.0',
   default_options : [
-    'warning_level=3',
-    'werror=true',
     'c_std=c11',
+    'warning_level=3',
+    'optimization=2',
+    'debug=true',
   ]
 )
 
-# Project configuration
-conf_data = configuration_data()
-conf_data.set('VERSION_MAJOR', '0')
-conf_data.set('VERSION_MINOR', '1')
-conf_data.set('VERSION_PATCH', '0')
-
-# Generate config header
-configure_file(
-  output : 'config.h',
-  configuration : conf_data
-)
-
-# Dependencies
 cc = meson.get_compiler('c')
-m_dep = cc.find_library('m', required : false)
+conf = configuration_data()
 
-# Include directories
-inc_dirs = include_directories('include')
+# Check for required headers
+conf.set('HAVE_STDINT_H', cc.has_header('stdint.h'))
+conf.set('HAVE_STDBOOL_H', cc.has_header('stdbool.h'))
+conf.set('HAVE_STRING_H', cc.has_header('string.h'))
 
-# Core source files
-core_sources = [
+# Check for required functions
+conf.set('HAVE_MEMMOVE', cc.has_function('memmove'))
+conf.set('HAVE_MEMSET', cc.has_function('memset'))
+
+# Set include directory
+inc_dir = include_directories('.')
+
+# Define source files
+sources = [
+  'src/coil_assembler.c',
+  'src/main.c',
   'src/core/binary_parser.c',
   'src/core/instruction_decoder.c',
+  'src/core/native_generator.c',
+  'src/core/optimization.c',
   'src/core/target_config.c',
   'src/core/translator.c',
-  'src/core/optimization.c',
-  'src/core/native_generator.c',
-]
-
-# Target-specific sources
-target_sources = [
-  'src/targets/x86/x86_translator.c',
-  'src/targets/x86/x86_optimizer.c',
-  'src/targets/x86/x86_generator.c',
-]
-
-# Utility sources
-util_sources = [
   'src/utils/error_handling.c',
-  'src/utils/memory_management.c',
   'src/utils/logging.c',
+  'src/utils/memory_management.c',
 ]
 
-# Main program
-main_sources = [
-  'src/main.c',
-  'src/coil_assembler.c',
+# Add architecture-specific sources based on platform
+x86_sources = [
+  'src/targets/x86/x86_generator.c',
+  'src/targets/x86/x86_optimizer.c',
+  'src/targets/x86/x86_translator.c',
 ]
 
-all_sources = core_sources + target_sources + util_sources + main_sources
+if host_machine.cpu_family() in ['x86', 'x86_64']
+  sources += x86_sources
+  conf.set('HAVE_X86_SUPPORT', 1)
+endif
 
-# Compiler flags
-c_args = [
-  '-D_GNU_SOURCE',
-  '-pedantic',
-  '-fstack-protector-strong',
-  '-fPIC',
-  '-Wall',
-  '-Wextra',
-  '-Wformat=2',
-  '-Wno-unused-parameter',
-  '-Wshadow',
-  '-Wwrite-strings',
-  '-Wstrict-prototypes',
-  '-Wold-style-definition',
-  '-Wredundant-decls',
-  '-Wmissing-include-dirs',
-  '-Wjump-misses-init',
-  '-Wlogical-op',
-]
+# ARM sources could be added similarly
+# arm_sources = [...]
+# if host_machine.cpu_family() in ['arm', 'aarch64']
+#   sources += arm_sources
+#   conf.set('HAVE_ARM_SUPPORT', 1)
+# endif
 
-# Build the executable
-coil_assembler = executable('coil-assembler',
-  all_sources,
-  include_directories : inc_dirs,
+# Generate config.h
+configure_file(output : 'config.h', configuration : conf)
+
+# Add compile arguments
+add_project_arguments('-D_POSIX_C_SOURCE=200809L', language : 'c')
+
+# Set up flags
+c_args = []
+if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
+  c_args += [
+    '-Wall',
+    '-Wextra',
+    '-Wpedantic',
+    '-Wstrict-prototypes',
+    '-Wmissing-prototypes',
+    '-Wno-unused-parameter',
+    '-Wshadow',
+    '-Wformat=2',
+    '-fno-common',
+  ]
+endif
+
+# Define executable
+executable('coil-assembler',
+  sources,
+  include_directories : inc_dir,
   c_args : c_args,
-  dependencies : [m_dep],
   install : true,
 )
 
-# Build the library
-coil_assembler_lib = library('coil_assembler',
-  all_sources,
-  include_directories : inc_dirs,
+# Create static library
+libtarget = static_library('coil',
+  sources,
+  include_directories : inc_dir,
   c_args : c_args,
-  dependencies : [m_dep],
   install : true,
+)
+
+# Declare dependency for internal use
+coil_dep = declare_dependency(
+  include_directories : inc_dir,
+  link_with : libtarget,
 )
 
 # Install headers
-install_headers('include/coil_assembler.h')
+install_headers(
+  'include/coil_assembler.h',
+  subdir : 'coil',
+)
 
-# Documentation
-doxygen = find_program('doxygen', required : false)
-if doxygen.found()
-  doxyfile = configure_file(
-    input : 'Doxyfile.in',
-    output : 'Doxyfile',
-    configuration : conf_data,
-  )
-  
-  custom_target('doc',
-    input : doxyfile,
-    output : 'html',
-    command : [doxygen, doxyfile],
-    build_by_default : false,
-  )
-endif
+# PKG-Config file
+pkg = import('pkgconfig')
+pkg.generate(
+  name : 'coil-assembler',
+  description : 'COIL Assembler',
+  version : '1.0.0',
+  libraries : libtarget,
+)
 
-# Unit tests
-subdir('tests/unit')
-
-# Integration tests
-subdir('tests/integration')
+# Add test directory
+subdir('tests')
