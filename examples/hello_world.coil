@@ -1,0 +1,46 @@
+;
+; Hello World COIL example
+;
+
+; Define the Linux x86-64 ABI for system calls
+DIR ABI abi-linux-x86_64
+{
+  args = [ R4, R5, R3, R6, R7 ]
+  rets = [ R0 ]
+  preserved = [ R1, R10, R11, R12, R13 ]
+  volatile = [ R0, R2, R3, R4, R5, R6, R7, R8, R9 ]
+  stack_align = 16
+}
+
+; Text section (code)
+DIR SECT text READ EXEC
+
+; Entry point
+DIR HINT _start FUNC GLOBAL
+DIR LABEL _start
+  ; Enter function frame
+  FRAME ENTER
+
+  ; Print hello world message
+  ; syscall: write(1, message, 14)
+  MEM MOV R4, 1         ; fd = 1 (stdout)
+  MEM MOV R5, message   ; buf = message
+  MEM MOV R3, 14        ; count = 14 (message length)
+  CF SYSC abi-linux-x86_64 (0x01) -> (R0)  ; sys_write
+
+  ; Exit program
+  ; syscall: exit(0)
+  MEM MOV R4, 0         ; status = 0
+  CF SYSC abi-linux-x86_64 (0x3C) -> ()    ; sys_exit
+
+  ; This should never be reached
+  FRAME LEAVE
+  CF RET
+DIR HINT _start ENDFUNC
+
+; Data section
+DIR SECT data READ
+
+; Hello world message
+DIR LABEL message
+  DIR INST "Hello, World!\n"
