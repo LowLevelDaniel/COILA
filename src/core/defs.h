@@ -232,7 +232,7 @@ enum VirtualRegisterID : uint8_t {
   // Special registers
   REG_PC    = 0x30,  // Program Counter
   REG_SP    = 0x31,  // Stack Pointer
-  REG_FP    = 0x32,  // Frame Pointer
+  REG_FRAME_PTR = 0x32, // Frame Pointer
   REG_FLAGS = 0x33,  // Status Flags
   REG_LR    = 0x34   // Link Register
 };

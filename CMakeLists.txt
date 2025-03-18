@@ -22,6 +22,9 @@ set(SOURCES
     src/main.cpp
     src/core/instruction.cpp
     src/core/operand.cpp
+    src/core/register.cpp
+    src/core/type.cpp
+    src/core/variable.cpp
     src/parser/lexer.cpp
     src/parser/parser.cpp
     src/binary/cof.cpp
@@ -31,6 +34,7 @@ set(SOURCES
     src/target/x86_64.cpp
     src/util/logger.cpp
     src/util/diagnostic.cpp
+    src/util/source_location.cpp
 )
 
 # Create the executable

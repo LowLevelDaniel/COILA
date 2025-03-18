@@ -107,6 +107,13 @@ public:
      * @return String representation
      */
     std::string toString() const;
+
+    /**
+    * @brief Create a clone of this instruction
+    * 
+    * @return Cloned instruction
+    */
+    std::unique_ptr<Instruction> clone() const;
 };
 
 } // namespace coil

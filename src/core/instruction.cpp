@@ -250,4 +250,18 @@ std::string Instruction::toString() const {
     return oss.str();
 }
 
+std::unique_ptr<Instruction> Instruction::clone() const {
+    auto cloned = std::make_unique<Instruction>(category, operation);
+    
+    // Clone all operands
+    for (const auto& op : operands) {
+        cloned->addOperand(op->clone());
+    }
+    
+    // Copy extended data
+    cloned->setExtendedData(extendedData);
+    
+    return cloned;
+}
+
 } // namespace coil

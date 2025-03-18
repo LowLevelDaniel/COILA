@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
+#include "util/source_location.h"
 #include "util/diagnostic.h"
 
 namespace coil {
@@ -40,20 +42,6 @@ enum TokenType {
     TOKEN_LABEL,          // Label identifier
     TOKEN_COMMENT,        // Comment
     TOKEN_ERROR           // Error token
-};
-
-/**
- * @brief Token position in source code
- */
-struct SourceLocation {
-    std::string filename;  // Source filename
-    int line;              // Line number (1-based)
-    int column;            // Column number (1-based)
-    
-    SourceLocation(const std::string& file = "", int l = 1, int c = 1)
-        : filename(file), line(l), column(c) {}
-        
-    std::string toString() const;
 };
 
 /**

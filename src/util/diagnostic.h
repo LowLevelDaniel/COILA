@@ -1,15 +1,12 @@
-#ifndef COIL_UTIL_DIAGNOSTIC_H
-#define COIL_UTIL_DIAGNOSTIC_H
+#pragma once
 
 #include <string>
 #include <vector>
 #include "parser/lexer.h"
 #include "util/logger.h"
+#include "util/source_location.h"
 
 namespace coil {
-
-// Forward declaration
-struct SourceLocation;
 
 /**
  * @brief Diagnostic severity
@@ -149,5 +146,3 @@ public:
 };
 
 } // namespace coil
-
-#endif // COIL_UTIL_DIAGNOSTIC_H

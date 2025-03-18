@@ -54,13 +54,6 @@ static const std::unordered_map<std::string, bool> directiveMap = {
     {"CONST", true}
 };
 
-// Implementation of SourceLocation toString method
-std::string SourceLocation::toString() const {
-    std::ostringstream oss;
-    oss << filename << ":" << line << ":" << column;
-    return oss.str();
-}
-
 // Implementation of Token toString method
 std::string Token::toString() const {
     std::ostringstream oss;
